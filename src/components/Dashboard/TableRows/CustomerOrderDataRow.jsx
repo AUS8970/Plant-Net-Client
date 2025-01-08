@@ -1,9 +1,26 @@
-import PropTypes from 'prop-types'
-import { useState } from 'react'
-import DeleteModal from '../../Modal/DeleteModal'
-const CustomerOrderDataRow = () => {
-  let [isOpen, setIsOpen] = useState(false)
-  const closeModal = () => setIsOpen(false)
+import { useState } from 'react';
+import DeleteModal from '../../Modal/DeleteModal';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
+
+const CustomerOrderDataRow = ({order, refetch }) => {
+
+  const axiosSecure = useAxiosSecure();
+
+  let [isOpen, setIsOpen] = useState(false);
+  const closeModal = () => setIsOpen(false);
+
+  const { _id, image, name, category, customer, plantId, price, quantity, seller, address, status } = order;
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosSecure.delete(`/order/${id}`);
+      refetch();
+    } catch (err) {
+      console.log(err)
+    } finally {
+      closeModal();
+    }
+  }
 
   return (
     <tr>
@@ -13,7 +30,7 @@ const CustomerOrderDataRow = () => {
             <div className='block relative'>
               <img
                 alt='profile'
-                src='https://i.ibb.co.com/rMHmQP2/money-plant-in-feng-shui-brings-luck.jpg'
+                src={image}
                 className='mx-auto object-cover rounded h-10 w-15 '
               />
             </div>
@@ -22,19 +39,19 @@ const CustomerOrderDataRow = () => {
       </td>
 
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 whitespace-no-wrap'>Money Plant</p>
+        <p className='text-gray-900 whitespace-no-wrap'> {name} </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 whitespace-no-wrap'>Indoor</p>
+        <p className='text-gray-900 whitespace-no-wrap'> {category} </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 whitespace-no-wrap'>$120</p>
+        <p className='text-gray-900 whitespace-no-wrap'> ${price} </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 whitespace-no-wrap'>5</p>
+        <p className='text-gray-900 whitespace-no-wrap'> {quantity} </p>
       </td>
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
-        <p className='text-gray-900 whitespace-no-wrap'>Pending</p>
+        <p className='text-gray-900 whitespace-no-wrap'> {status} </p>
       </td>
 
       <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
@@ -46,15 +63,10 @@ const CustomerOrderDataRow = () => {
           <span className='relative cursor-pointer'>Cancel</span>
         </button>
 
-        <DeleteModal isOpen={isOpen} closeModal={closeModal} />
+        <DeleteModal handleDelete={handleDelete} isOpen={isOpen} closeModal={closeModal} />
       </td>
     </tr>
   )
 }
 
-CustomerOrderDataRow.propTypes = {
-  order: PropTypes.object,
-  refetch: PropTypes.func,
-}
-
-export default CustomerOrderDataRow
+export default CustomerOrderDataRow;

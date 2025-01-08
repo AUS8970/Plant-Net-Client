@@ -72,7 +72,6 @@ const AddPlantForm = ({ handleSubmit, loading }) => {
                   required
                 />
               </div>
-
               {/* Quantity */}
               <div className='space-y-1 text-sm'>
                 <label htmlFor='quantity' className='block text-gray-600'>

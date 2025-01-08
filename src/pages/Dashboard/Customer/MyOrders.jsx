@@ -1,11 +1,35 @@
-import { Helmet } from 'react-helmet-async'
-import CustomerOrderDataRow from '../../../components/Dashboard/TableRows/CustomerOrderDataRow'
+import { Helmet } from 'react-helmet-async';
+import CustomerOrderDataRow from '../../../components/Dashboard/TableRows/CustomerOrderDataRow';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
+import { useQuery } from '@tanstack/react-query';
+import useAuth from '../../../hooks/useAuth';
+import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
 const MyOrders = () => {
+
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+
+  const { 
+    data: orders = [],
+    isLoading,
+    refetch
+   } = useQuery({
+    queryKey: ['orders', user?.email],
+    queryFn: async () => {
+      const { data } = await axiosSecure(`/customer-orders/${user?.email}`)
+      return data;
+    }
+  });
+
+  console.log(orders)
+
+  if ( isLoading ) return <LoadingSpinner />
+
   return (
     <>
       <Helmet>
-        <title>My Orders</title>
+        <title> My Orders </title>
       </Helmet>
       <div className='container mx-auto px-4 sm:px-8'>
         <div className='py-8'>
@@ -60,7 +84,11 @@ const MyOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <CustomerOrderDataRow />
+                  { orders.map(order => <CustomerOrderDataRow 
+                    key={order._id}
+                    refetch={refetch} 
+                    order={order} 
+                  />)}
                 </tbody>
               </table>
             </div>
